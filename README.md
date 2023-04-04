@@ -31,7 +31,7 @@ USE Finance;
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 DROP TABLE DimCustomer;
 
-CREATE TABLE DimCustomer (
+''' CREATE TABLE DimCustomer (
     CustomerKey INT PRIMARY KEY,
     GeographyKey INT,
     CustomerAlternateKey NVARCHAR(15),
@@ -61,7 +61,7 @@ CREATE TABLE DimCustomer (
     Phone NVARCHAR(25),
     DateFirstPurchase DATE,
     CommuteDistance NVARCHAR(15)
-	);
+	); '''
 
 ##### Data Cleanup before import : 
 + Convert Birthdate and DateFirstPurchase fields into YYYY/MM/DD format. Both fields had date and number data types before conversion
