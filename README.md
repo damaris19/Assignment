@@ -3,7 +3,7 @@ To show case the Senior Data Analyst Project Assignment
 
 ## Database Connection
 
-###I used a Microsoft SQL Server Management Database. Connection Steps as follows:
+### I used a Microsoft SQL Server Management Database. Connection Steps as follows:
 
 *Open Microsoft SQL Server Management Studio (SSMS).
 *Connect to your SQL Server instance : I am using a local instance
