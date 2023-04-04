@@ -24,9 +24,11 @@ DROP DATABASE finance;
 CREATE DATABASE Finance;
 
 USE Finance;
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Creating Tables 
--- Create the DimCustomer table 
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+### Creating Tables 
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+#### Create the DimCustomer table 
+----------------------------------------------------------------------------------------------------------------------------------------------------------
 DROP TABLE DimCustomer;
 
 CREATE TABLE DimCustomer (
@@ -61,10 +63,10 @@ CREATE TABLE DimCustomer (
     CommuteDistance NVARCHAR(15)
 	);
 
-####Data Cleanup before import : 
+##### Data Cleanup before import : 
 + Convert Birthdate and DateFirstPurchase fields into YYYY/MM/DD format. Both fields had date and number data types before conversion
 
-####Import data from csv file and bulk insert into the DimCustomer table
+##### Import data from csv file and bulk insert into the DimCustomer table
 + BULK INSERT DimCustomer
 + FROM 'C:\Users\DAMARIS\Documents\CUST.csv'
 + WITH (
@@ -74,13 +76,11 @@ CREATE TABLE DimCustomer (
   + ROWTERMINATOR = '\n'
 + )
 + GO
--- Checking that the field records are inserted in DimCustomer table
+##### Checking that the field records are inserted in DimCustomer table
 SELECT * 
   FROM DimCustomer 
 GO
---EXPLORATORY DATA ANALYSIS ON THE CUSTOMERS
-
---Checking total count
+##### Checking total count
 SELECT COUNT(*)
   FROM DimCustomer
 GO -- there are  18484 records
@@ -88,74 +88,79 @@ GO -- there are  18484 records
 SELECT COUNT(distinct DimCustomer.CustomerKey) -- total of 18484 unique customer ids, hence no duplicates in this table
     FROM DimCustomer
 GO
----Looking for customer country using the geography key
+##### Looking for customer country using the geography key
 --SELECT 
 --  Geographykey, 
 --  CAST(Geographykey AS geography).STAsText() AS location_name 
 --FROM DimCustomer;
 
---Looking at Average Yearly income 
+##### Looking at Average Yearly income 
 SELECT AVG(YearlyIncome)
 FROM DimCustomer
 GO ---Average customer earns  $57305
 
---Checking customers earnings by gender
-SELECT Gender, SUM(YearlyIncome) -- Men earn more than women overall but other factor need to be checked. I.e more men than women? Avg income by gender
+##### Checking customers earnings by gender
+SELECT Gender, SUM(YearlyIncome) -- Men earn more than women overall but other factor need to be checked. I.e more men than women? Avg income by gender?
 FROM DimCustomer
 GROUP BY Gender
 ORDER BY SUM(YearlyIncome) ASC
 GO
 
---Checking customers  split by gender to check if there are more men that women
+##### Checking customers  split by gender to check if there are more men that women
 SELECT Gender, COUNT(CustomerKey) 
 FROM DimCustomer
 GROUP BY Gender
 GO
 
---Checking % of Male customers
+##### Checking % of Male customers
 SELECT 
-(COUNT(CASE WHEN Gender ='M' THEN 1 END)/CAST(COUNT(*) AS float)*100.00) AS Percentage_Male_Customers -- Male customers make 50.58% of total customers
+(COUNT(CASE WHEN Gender ='M' THEN 1 END)/CAST(COUNT(*) AS float)*100.00) AS Percentage_Male_Customers --  Male customers make 50.58% of total customers
 FROM DimCustomer
 GO
 
--- Checking Average income by Gender 
+##### Checking Average income by Gender 
 SELECT Gender, AVG(YearlyIncome)
 FROM DimCustomer
 GROUP BY Gender
 GO -- Avg yearly income is higher for female customers @ 57369, and Male @57243
 
---Customers  distribution by education level
+##### Customers  distribution by education level
 SELECT EnglishEducation, COUNT(*) AS Numbner_of_Customers, COUNT(*) / ROUND(CAST(SUM(COUNT(*)) OVER() AS float),2)* 100 AS Percent_Contribution
 FROM DimCustomer
 GROUP BY EnglishEducation
 GO-- HIghest number of customers have  some college or Bachelors 
 
---Looking at the Commute Distance or locality for Customers
+##### Looking at the Commute Distance or locality for Customers
 SELECT CommuteDistance, COUNT(*) AS Numbner_of_Customers, COUNT(*) / ROUND(CAST(SUM(COUNT(*)) OVER() AS float),2)* 100 AS Percent_Contribution
 FROM DimCustomer
 GROUP BY CommuteDistance
 GO-- Majority of the customers(51%)  live within 2 miles
--- Number of average number of children per customer
+
+##### Number of average number of children per customer
 SELECT AVG(TotalChildren)
 FROM DimCustomer-- 1 child on average per customer
 GO 
---Checking Marital status of customers
+##### Checking Marital status of customers
 SELECT MaritalStatus, COUNT(*) AS Numbner_of_Customers, COUNT(*) / ROUND(CAST(SUM(COUNT(*)) OVER() AS float),2)* 100 AS Percent_Contribution
 FROM DimCustomer
 GROUP BY MaritalStatus---54% of Customers are married.
 
+##### Checking % of customers by Car Ownership
 SELECT HouseOwnerFlag, COUNT(*) AS Numbner_of_Customers, COUNT(*) / ROUND(CAST(SUM(COUNT(*)) OVER() AS float),2)* 100 AS Percent_Contribution
 FROM DimCustomer
 GROUP BY HouseOwnerFlag -- 67% of customers own a house
 
+##### Checking the % of customers with atleast 1 car
 SELECT (SELECT COUNT(*)
                FROM DimCustomer 
 	           WHERE NumberCarsOwned > 0) / ROUND(CAST(SUM(COUNT(*)) OVER() AS float),2)* 100 AS Percentage_owning_cars
 FROM DimCustomer
 GROUP BY NumberCarsOwned -- 77% of customers own a car
 
--- In Summary the best customer target market is middle class 2 parent families who live less than 2 miles from the store, have atleast 1 child and have some form of college education.They also own a house and a car
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+##### In Summary the best customer target market is middle class 2 parent families who live less than 2 miles from the store, have atleast 1 child and have some form of college education.They also own a house and a car
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+#### Creating the DimProduct table
+----------------------------------------------------------------------------------------------------------------------------------------------------------
 DROP TABLE DimProduct;
 --Create table DimProduct table fields:
 CREATE TABLE DimProduct (
@@ -185,7 +190,7 @@ CREATE TABLE DimProduct (
     Status NVARCHAR(50)               DEFAULT NULL
 );
 
--- Import data from csv file and bulk insert into the Dim Product table
+##### Import data from csv file and bulk insert into the Dim Product table
 BULK INSERT DimProduct
 FROM 'C:\Users\DAMARIS\Documents\PRODUCT.csv'
 WITH (
@@ -195,69 +200,63 @@ WITH (
   ROWTERMINATOR = '\n'
 )
 GO
--- Checking that the field records are inserted in DimProduct table
+##### Checking that the field records are inserted in DimProduct table
 SELECT* 
  FROM  DimProduct
 GO
----------------------------------------------------------------------------------------
---EXPLORATORY DATA ANALYSIS ON THE PRODUCTS
 
+##### Checking that  number of records are inserted in DimProduct table
 SELECT COUNT(*)
  FROM  DimProduct
 GO -- No of records =569 
 
---Checking for duplicates
+##### Checking for duplicates
 SELECT COUNT(DISTINCT ProductKey)
- FROM  DimProduct
+ FROM  DimProduct 
 GO 
--- Product unit codes
-SELECT WeightUnitMeasureCode, COUNT(ProductKey) AS Product_Count
-FROM DimProduct
-GROUP BY WeightUnitMeasureCode
-GO
--- Converting quantity tables from VARCHAR to Float DATA TYPES for aggregation and anaysis
--- Create a backup of the original DimProduct table to retain original table values and data types.
+
+#### Converting quantity tables from VARCHAR to Float DATA TYPES for aggregation and anaysis
+#### Create a backup of the original DimProduct table to retain original table values and data types we can rename table back to DimProduct later.
 DROP TABLE DimProduct_Backup;
 SELECT *
 INTO DimProduct_Backup
 FROM DimProduct
 GO
---Check that the back up table has the inserted fields 
+##### Check that the back up table has the inserted fields 
 SELECT * 
 FROM DimProduct_Backup 
 GO
-
+##### Continue with the original table 
 SELECT* 
  FROM  DimProduct
 GO
---EDA dealing with null values and changing varchat data types 
----Changing some fields to allow for aggregation and calculation the fields 
 
---Standard Cost --   
+#### Dealing with null values and changing varchat data types to allow for aggregation and calculation the fields 
+
+###### Standard Cost --   
 UPDATE DimProduct SET StandardCost = 0 WHERE StandardCost = 'NULL'; --Replacing Null nvarchar values with 0 first to allow for data type conversion,to avoid errors .
 ALTER TABLE DimProduct ALTER COLUMN StandardCost FLOAT NOT NULL; -- Converting nvachar data type to float for aggregation and calculation 
 --ALTER TABLE DimProduct ADD CONSTRAINT DF_DimProduct_StandardCost DEFAULT 0 FOR StandardCost; -- Adding the default constraint of 0 
  
---ListPrice
+###### ListPrice
 UPDATE DimProduct SET ListPrice = 0 WHERE ListPrice = 'NULL';
 ALTER TABLE DimProduct ALTER COLUMN ListPrice FLOAT NOT NULL;
---ALTER TABLE DimProduct ADD CONSTRAINT DF_DimProduct_ListPrice DEFAULT 0 FOR ListPrice;
 
---Weight
+###### Weight
 UPDATE DimProduct SET Weight = 0 WHERE Weight = 'NULL';
 ALTER TABLE DimProduct ALTER COLUMN Weight FLOAT NOT NULL;
---ALTER TABLE DimProduct ADD CONSTRAINT DF_DimProduct_Weight DEFAULT 0 FOR Weight;
 
---DealerPrice
+###### DealerPrice
 UPDATE DimProduct SET DealerPrice = 0 WHERE DealerPrice = 'NULL';
 ALTER TABLE DimProduct ALTER COLUMN DealerPrice FLOAT NOT NULL;
---ALTER TABLE DimProduct ADD CONSTRAINT DF_DimProduct_DealerPrice DEFAULT 0 FOR DealerPrice;
 
---
+###### Checking the average cost of products 
 SELECT AVG(StandardCost)
 FROM DimProduct
 WHERE StandardCost > 0 -- exclude values where  standard cost = 0
-GO -- avg cost of production is 395.96
+GO 
+####### avg cost of production is 395.96
+
 --Aver
 SELECT ProductName,AVG(StandardCost) AS Avg_Standard_Cost
 FROM DimProduct
