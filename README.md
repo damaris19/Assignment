@@ -61,18 +61,19 @@ CREATE TABLE DimCustomer (
     CommuteDistance NVARCHAR(15)
 	);
 
---Data Cleanup before import : Convert Birthdate and DateFirstPurchase fields into YYYY/MM/DD format. Both fields had date and number data types before conversion
+####Data Cleanup before import : 
++ Convert Birthdate and DateFirstPurchase fields into YYYY/MM/DD format. Both fields had date and number data types before conversion
 
--- Import data from csv file and bulk insert into the DimCustomer table
-BULK INSERT DimCustomer
-FROM 'C:\Users\DAMARIS\Documents\CUST.csv'
-WITH (
-  FORMAT = 'CSV',
-  FIRSTROW = 2,
-  FIELDTERMINATOR = ',',
-  ROWTERMINATOR = '\n'
-)
-GO
+####Import data from csv file and bulk insert into the DimCustomer table
++ BULK INSERT DimCustomer
++ FROM 'C:\Users\DAMARIS\Documents\CUST.csv'
++ WITH (
+  + FORMAT = 'CSV',
+  + FIRSTROW = 2,
+  + FIELDTERMINATOR = ',',
+  + ROWTERMINATOR = '\n'
++ )
++ GO
 -- Checking that the field records are inserted in DimCustomer table
 SELECT * 
   FROM DimCustomer 
